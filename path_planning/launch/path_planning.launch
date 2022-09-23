@@ -1,0 +1,16 @@
+<!-- -->
+
+<launch>
+
+    <node pkg="path_planning" type="path_planning_node" name="path_planning_node" output="screen">
+        <param name="task" value="0"/> <!-- 0: Forward, 1: Backward -->
+        <param name="type" value="3"/> <!-- 1: POSE_TYPE, 2: PATH_TYPE, 3: FILE_TYPE -->
+        
+        <param name="path_resolution" value="0.1"/>
+        <param name="expect_speed" value="15"/> <!-- km/h -->
+        <param name="roadnet_file" value="/home/seu/Desktop/path/CLXT_001.txt"/> <!-- xxx.txt -->
+        <param name="path_filp" value="false"/>
+    </node>
+
+</launch>
+

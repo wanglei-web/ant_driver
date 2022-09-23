@@ -1,0 +1,54 @@
+<!-- -->
+<launch>
+	<!-- 底层控制 -->
+	<arg name="can_port" default="/dev/U4"/> <!-- CAN -->
+	<arg name="stm32_port" default="/dev/U6"/> <!-- STM32 -->
+	<node name="ant_driver_node" pkg="ant_driver" type="ant_driver" output="screen" required="true">
+		<param name ="obd_can_port_name" value="$(arg can_port)"/>
+		<param name ="stm32_port_name" value="$(arg stm32_port)"/>
+		<param name ="stm32_baudrate" value="115200"/>
+		<param name ="max_steering_speed" value="2.0"/> <!-- 前后帧转角最大差值 -->
+		<param name ="steering_offset" value="20"/> <!-- 左负右正 -->
+		<param name ="default_drive_gear" value="false"/> <!-- 默认D档 -->
+	</node>
+	
+	<!-- 上层控制 -->
+	<node name="driverless_node" pkg="driverless" type="driverless_node" output="screen" launch-prefix="gnome-terminal -x">
+		<rosparam file="$(find driverless)/config/vehicle_params.yaml" command="load"/>
+		<!-- main -->
+		<param name="odom_topic" value="/gps_odom"/>
+		
+		<!-- path_tracking -->
+		<param name="min_foresight_distance_for_drive" value="5.0"/>
+		<param name="min_foresight_distance_for_reverse" value="3.0"/>
+		<param name="limit_speed_for_drive" value="40"/>
+		<param name="limit_speed_for_reverse" value="5"/>
+		<param name="max_deceleration" value="1.0"/>
+		
+		<!-- local_path_planning -->
+		<param name="sub_topic_obstacle_array" value="/obstacle_array"/>
+		<param name="sub_topic_obu_fusion" value="/msgs_obu"/>
+		<param name="sub_topic_light" value="/light"/>
+		<param name="default_local_path_length" value="50.0"/>
+		<param name="min_following_distance" value="15.0"/>
+		<param name="max_search_range" value="50.0"/>
+		<param name="safe_margin" value="0.3"/>
+		<param name="lane_left_width" value="1.75"/>
+		<param name="lane_right_width" value="1.75"/>
+		<param name="use_avoiding" value="true"/>
+		<param name="max_avoiding_speed" value="4.0"/>
+		<param name="min_offset_increment" value="2.7"/>
+		<param name="max_avoiding_distance" value="20.0"/>
+		<param name="min_avoiding_distance" value="10.0"/>
+		<param name="repeat_detection_threshold" value="2"/>
+		<param name="delay_threshold" value="20"/>
+
+	</node> 
+	
+	<!-- GPS -->
+	<include file="$(find novatel)/launch/novatel.launch"/>
+	
+	<!-- RTK -->
+	<include file="$(find rtk)/launch/rtk.launch"/>
+
+</launch>
